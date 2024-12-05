@@ -1,3 +1,1 @@
-transformers==4.30.0
-torch==2.1.0  # Make sure to choose the correct version based on your hardware (CPU or GPU)
-numpy==1.23.5
+openai
