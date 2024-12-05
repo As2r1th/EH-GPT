@@ -3,7 +3,7 @@ import json
 import urllib.request
 
 # Directly set your OpenAI API key here
-openai_api_key = "sk-efghijkl5678mnopabcd1234efghijkl5678mnop"  # Replace with your actual key
+openai_api_key = "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"  # Replace with your actual key
 
 # Check for OpenAI API key
 if not openai_api_key:
