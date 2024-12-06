@@ -1,6 +1,6 @@
-fastapi==0.95.2
-uvicorn==0.23.2
-colorama==0.4.6
-scapy==2.5.0
-transformers==4.31.0
+fastapi==0.103.0
+uvicorn==0.22.0
+transformers==4.35.0
+torch==2.1.0
 cryptography==39.0.1
+colorama==0.4.6
