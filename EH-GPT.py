@@ -50,8 +50,14 @@ def generate_response(prompt, parameters):
     try:
         response = requests.post(API_ENDPOINT, headers=headers, json=data)
         response.raise_for_status()  # Raise error for bad status codes
+
+        print("[INFO] Response received from API.")
+        
+        # Debugging: Print the raw response to check its structure
+        print(f"[DEBUG] Raw API Response: {response.text}")
+
         response_data = response.json()
-        return response_data[0]["generated_text"]
+        return response_data[0].get("generated_text", "No code generated.")
     except requests.exceptions.HTTPError as err:
         return f"HTTP error occurred: {err}"
     except Exception as e:
