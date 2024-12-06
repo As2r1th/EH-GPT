@@ -2,7 +2,7 @@ import os
 import requests
 
 # Set your Hugging Face API key here
-huggingface_api_key = "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"  # Use your own API key
+huggingface_api_key = "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"  # New API key
 
 # Set the Hugging Face API endpoint for GPT-J model
 API_ENDPOINT = "https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B"  # GPT-J model endpoint
