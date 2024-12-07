@@ -1,3 +1,2 @@
 requests
-colorama
-nmap  # If using nmap for device scanning; ensure nmap package is installed in Alpine
+py3-nmap
