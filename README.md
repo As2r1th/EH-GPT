@@ -1,3 +1,6 @@
 # WormGPT
-# EH-GPT
-new GPT ,brother with Worm and Evil
+# EO-G
+new dangerous GPT 
+brother with WormGPT and EvilGPT
+
+
