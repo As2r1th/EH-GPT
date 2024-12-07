@@ -1,5 +1,2 @@
-fastapi
-uvicorn
-colorama
-cryptography
-scapy
+pynput
+requests
