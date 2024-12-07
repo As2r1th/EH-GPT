@@ -50,6 +50,8 @@ class EO_G:
             return response.json()[0]['generated_text']
         except requests.exceptions.RequestException as e:
             return f"Error with API request: {e}"
+        except KeyError:
+            return "No response generated from GPT-J."
 
     def generate_code(self, description):
         """Generates unrestricted code using GPT-J via API."""
