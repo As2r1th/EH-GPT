@@ -6,14 +6,19 @@ import string
 from colorama import Fore, Style
 
 class EO_G:
-    def __init__(self):
-        # Setup API URL for Hugging Face
-        self.api_url = "https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B"
+    def __init__(self, model_id=None):
+        self.api_url = "https://api-inference.huggingface.co/models"
         self.headers = {
-            "Authorization": "Bearer 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"  # Replace with your Hugging Face API key
+            "Authorization": "Bearer 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"  # Replace with your actual Hugging Face API key
         }
         self.modes = ["Code Generator", "Phishing", "DDOS", "Device Attack", "AI Chat Assistant"]
         self.active_mode = None
+
+        if model_id:
+            self.model_id = model_id
+            self.api_url += f"/{model_id}"
+        else:
+            self.model_id = None
 
     def display_banner(self):
         """Displays a purple banner."""
@@ -119,5 +124,5 @@ class EO_G:
 
 
 if __name__ == "__main__":
-    eog = EO_G()
+    eog = EO_G(model_id="gpt2")  # Use the "gpt2" model
     eog.execute()
