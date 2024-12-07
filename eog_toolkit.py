@@ -9,7 +9,7 @@ class EO_G:
     def __init__(self):
         # Replace with your Hugging Face API key
         self.api_key = "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"
-        self.api_url = "https://api-inference.huggingface.co/models/gpt-3"  # Use GPT-3 instead of GPT-2
+        self.api_url = "https://api-inference.huggingface.co/models/gpt2"
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
         self.modes = {
             1: "Generate Code",
@@ -42,12 +42,12 @@ class EO_G:
         print(banner)
 
     def generate_response(self, prompt, context="general"):
-        """Generates a response using GPT API."""
+        """Generates a response using Hugging Face API."""
         refined_prompt = f"Context: {context}\nPrompt: {prompt}"
         payload = {
             "inputs": refined_prompt,
             "parameters": {
-                "max_length": 300,
+                "max_length": 1024,
                 "temperature": 0.7
             }
         }
@@ -61,7 +61,7 @@ class EO_G:
             return "No response generated."
 
     def generate_code(self, description):
-        """Generates code using the GPT API."""
+        """Generates code using the Hugging Face API."""
         print(f"[EO-G] Generating code for: {description}")
         resources_prompt = f"Here are some useful resources for learning to write code:\n"
         resources_prompt += "\n".join(self.code_resources)
@@ -105,7 +105,7 @@ class EO_G:
             return f"Error during network scan: {e}"
 
     def ai_chat_assistant(self, query):
-        """Handles queries using the GPT API."""
+        """Handles queries using the Hugging Face API."""
         print(f"[EO-G] Processing query: {query}")
         return self.generate_response(query, context="chat assistant")
 
