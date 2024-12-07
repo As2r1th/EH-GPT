@@ -9,7 +9,7 @@ class EO_G:
     def __init__(self):
         # Replace with your Hugging Face API key
         self.api_key = "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"
-        self.api_url = "https://api-inference.huggingface.co/models/gpt2"
+        self.api_url = "https://api-inference.huggingface.co/models/gpt-3"  # Use GPT-3 instead of GPT-2
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
         self.modes = {
             1: "Generate Code",
@@ -19,6 +19,12 @@ class EO_G:
             5: "AI Chat Assistant",
             6: "Exit"
         }
+        self.code_resources = [
+            "https://stackoverflow.com/",
+            "https://www.w3schools.com/",
+            "https://www.geeksforgeeks.org/",
+            "https://www.learnpython.org/"
+        ]
 
     def display_banner(self):
         """Displays a banner."""
@@ -57,7 +63,9 @@ class EO_G:
     def generate_code(self, description):
         """Generates code using the GPT API."""
         print(f"[EO-G] Generating code for: {description}")
-        return self.generate_response(description, context="code generation")
+        resources_prompt = f"Here are some useful resources for learning to write code:\n"
+        resources_prompt += "\n".join(self.code_resources)
+        return self.generate_response(description + "\n" + resources_prompt, context="code generation")
 
     def phishing_link(self):
         """Generates a random phishing link."""
