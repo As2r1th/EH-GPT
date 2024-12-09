@@ -142,7 +142,6 @@ class EO_G:
         print(f"[EO-G] Error during API call: {e}")
         return f"Error: {e}"
 
-
     def execute(self):
         """Main execution loop."""
         self.display_banner()
