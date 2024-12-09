@@ -122,14 +122,26 @@ class EO_G:
             print(f"Error during website attack: {e}")
 
     def deepai_text_generation(self, prompt):
-        """Generates real text via DeepAI API."""
+    """Generates real text via DeepAI API."""
+    try:
+        # Directly using the API key here
         response = requests.post(
             "https://api.deepai.org/api/text-generator",
             data={'text': prompt},
-            headers={'api-key':"d0bc3e9a-24f7-48ba-829f-e392fc3cf17a"}
+            headers={'api-key': "d0bc3e9a-24f7-48ba-829f-e392fc3cf17a"}  # Directly put your API key here
         )
         result = response.json()
-        return result['output']
+
+        # Check if the response contains the 'output' key
+        if 'output' in result:
+            return result['output']
+        else:
+            print(f"[EO-G] Error: 'output' key not found in response. Full response: {result}")
+            return "Error: Unable to generate text. Check the API response."
+    except requests.exceptions.RequestException as e:
+        print(f"[EO-G] Error during API call: {e}")
+        return f"Error: {e}"
+
 
     def execute(self):
         """Main execution loop."""
