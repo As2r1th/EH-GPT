@@ -126,7 +126,7 @@ class EO_G:
         response = requests.post(
             "https://api.deepai.org/api/text-generator",
             data={'text': prompt},
-            headers={'api-key': d0bc3e9a-24f7-48ba-829f-e392fc3cf17a}
+            headers={'api-key':"d0bc3e9a-24f7-48ba-829f-e392fc3cf17a"}
         )
         result = response.json()
         return result['output']
